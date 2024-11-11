@@ -1,6 +1,6 @@
 # VLMnav: End-to-End Navigation with VLMs: Transforming Spatial Reasoning into Question-Answering
 
-This repo contains code for our paper [End-to-End Navigation with VLMs: Transforming Spatial Reasoning into Question-Answering](link).
+This repo contains code for our paper [End-to-End Navigation with VLMs: Transforming Spatial Reasoning into Question-Answering](https://arxiv.org/abs/2411.05755).
 
 For a brief overview, check out the project [webpage](https://jirl-upenn.github.io/VLMnav/)!
 
