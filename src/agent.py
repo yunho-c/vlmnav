@@ -316,7 +316,7 @@ class VLMNavAgent(Agent):
                     smallest_theta = filtered[i][1]
 
 
-        if (out == [] or max(out, key=lambda x: x[0])[0] < self.cfg['min_action_dist']) and (self.step - self.turned) < self.cfg['turn_around_cooldown']:
+        if (out == [] or max(out, key=lambda x: x[0])[0] < self.cfg['min_action_dist']) and (self.step_ndx - self.turned) < self.cfg['turn_around_cooldown']:
             return self._get_default_arrows()
         
         out.sort(key=lambda x: x[1])
