@@ -4,7 +4,7 @@ This repo contains code for our paper [End-to-End Navigation with VLMs: Transfor
 
 For a brief overview, check out the project [webpage](https://jirl-upenn.github.io/VLMnav/)!
 
-For any questions, please contact [Dylan Goetting](https://github.com/dylan-goetting).
+For any questions, please contact [Dylan Goetting](https://dylan-goetting.github.io).
 
 
 <p align="center">
