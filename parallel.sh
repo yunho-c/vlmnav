@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # Configuration Variables
-NUM_GPU=5
+NUM_GPU=1
 INSTANCES=50
 NUM_EPISODES_PER_INSTANCE=20
 MAX_STEPS_PER_EPISODE=40
 TASK="ObjectNav"
 CFG="ObjectNav"
-NAME="ours"
+NAME=
 SLEEP_INTERVAL=200
 LOG_FREQ=200
 PORT=2000
-VENV_NAME="vlm_nav" # Name of the conda environment
+VENV_NAME="habitat" # Name of the conda environment
 CMD="python scripts/main.py --config ${CFG} -ms ${MAX_STEPS_PER_EPISODE} -ne ${NUM_EPISODES_PER_INSTANCE} --name ${NAME} --instances ${INSTANCES} --parallel -lf ${LOG_FREQ} --port ${PORT}"
 
 # Tmux Session Names
