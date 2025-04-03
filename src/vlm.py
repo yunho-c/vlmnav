@@ -7,12 +7,12 @@ import cv2
 
 from PIL import Image
 from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation, pipeline
-from utils import append_mime_tag, encode_image_b64
+from utils import append_mime_tag, encode_image_b64, resize_image_if_needed
 
 
 class VLM:
     """
-    Base class for a Vision-Language Model (VLM) agent. 
+    Base class for a Vision-Language Model (VLM) agent.
     This class should be extended to implement specific VLMs.
     """
 
@@ -34,7 +34,7 @@ class VLM:
             The text prompt to be processed by the agent.
         """
         raise NotImplementedError
-    
+
     def call_chat(self, history: int, images: list[np.array], text_prompt: str):
         """
         Perform context-aware inference with the VLM, incorporating past context.
@@ -99,7 +99,7 @@ class GeminiVLM(VLM):
         self.spend = 0
         self.cost_per_input_token = 0.075 / 1_000_000 if 'flash' in self.name else 1.25 / 1_000_000
         self.cost_per_output_token = 0.3 / 1_000_000 if 'flash' in self.name else 5 / 1_000_000
-        
+
         # Initialize Gemini model and chat session
         self.model = genai.GenerativeModel(
             model_name=model,
@@ -132,13 +132,13 @@ class GeminiVLM(VLM):
                 self.session = self.model.start_chat(history=[])
             elif len(self.session.history) > 2 * history:
                 self.session.history = self.session.history[-2 * history:]
-        
-        except Exception as e:  
+
+        except Exception as e:
             logging.error(f"GEMINI API ERROR: {e}")
             return "GEMINI API ERROR"
 
         return response.text
-    
+
     def rewind(self):
         """
         Rewind the chat history by one step.
@@ -169,12 +169,12 @@ class GeminiVLM(VLM):
             self.spend += (response.usage_metadata.prompt_token_count * self.cost_per_input_token +
                            response.usage_metadata.candidates_token_count * self.cost_per_output_token)
 
-        except Exception as e:  
+        except Exception as e:
             logging.error(f"GEMINI API ERROR: {e}")
             return "GEMINI API ERROR"
 
         return response.text
-    
+
     def get_spend(self):
         """
         Retrieve the total spend on model usage.
@@ -187,7 +187,7 @@ class OpenAIVLM(VLM):
     An implementation using models served via OpenAI API.
     """
 
-    def __init__(self, model="gpt-4o-latest", system_instruction=None):
+    def __init__(self, model="gpt-4o-latest", system_instruction=None, max_image_res=None):
         """
         Initialize the OpenAI model with specified configuration.
 
@@ -205,7 +205,8 @@ class OpenAIVLM(VLM):
             api_key=os.environ.get("OPENAI_API_KEY"),
         )
         self.model = model
-        self.history = []
+        self.history = [] 
+        self.max_image_res = max_image_res
 
 
     def call_chat(self, history: int, images: list[np.array], text_prompt: str):
@@ -304,7 +305,9 @@ class OpenAIVLM(VLM):
                 "type": "image_url",
                 "image_url":
                 {
-                    "url": append_mime_tag(encode_image_b64(Image.fromarray(image[:, :, :3], mode='RGB')))
+                    "url": append_mime_tag(encode_image_b64(Image.fromarray(image[:, :, :3], mode='RGB'))) \
+                    if self.max_image_res is None else append_mime_tag(encode_image_b64(
+                        resize_image_if_needed(Image.fromarray(image[:, :, :3], mode='RGB'), self.max_image_res)))
                 }
             }
             for image in images

@@ -341,3 +341,34 @@ def encode_image_b64(image: Image.Image, format="PNG") -> str:
 def append_mime_tag(image_b64, format="png"):
     return f"data:image/{format};base64,{image_b64}"
 
+
+def resize_image_if_needed(image: Image.Image, max_dimension: int) -> Image.Image:
+    """
+    Resize a PIL image to ensure that its largest dimension does not exceed max_size.
+
+    Parameters:
+        image (Image.Image): The PIL image to resize.
+        max_size (int): The maximum size for the largest dimension.
+
+    Returns:
+        Image.Image: The resized image.
+    """
+    width, height = image.size
+
+    # Check if the image has a palette and convert it to true color mode
+    if image.mode == "P":
+        if "transparency" in image.info:
+            image = image.convert("RGBA")
+        else:
+            image = image.convert("RGB")
+
+    if width > max_dimension or height > max_dimension:
+        if width > height:
+            new_width = max_dimension
+            new_height = int(height * (max_dimension / width))
+        else:
+            new_height = max_dimension
+            new_width = int(width * (max_dimension / height))
+        image = image.resize((new_width, new_height), Image.LANCZOS)
+
+    return image

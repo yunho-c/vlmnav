@@ -26,6 +26,7 @@ agent_cfg:
     # model_cls: OpenAIVLM
     # model_kwargs:
     #   model: <model-name>
+    #   max_image_res: 512
 
 sim_cfg:
   agent_height: 1.5
