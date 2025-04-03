@@ -23,6 +23,9 @@ agent_cfg:
     model_cls: GeminiVLM
     model_kwargs:
       model: gemini-1.5-flash-001
+    # model_cls: OpenAIVLM
+    # model_kwargs:
+    #   model: <model-name>
 
 sim_cfg:
   agent_height: 1.5

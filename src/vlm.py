@@ -7,6 +7,7 @@ import cv2
 
 from PIL import Image
 from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation, pipeline
+from utils import append_mime_tag, encode_image_b64
 
 
 class VLM:
@@ -179,6 +180,136 @@ class GeminiVLM(VLM):
         Retrieve the total spend on model usage.
         """
         return self.spend
+
+
+class OpenAIVLM(VLM):
+    """
+    An implementation using models served via OpenAI API.
+    """
+
+    def __init__(self, model="gpt-4o-latest", system_instruction=None):
+        """
+        Initialize the OpenAI model with specified configuration.
+
+        Parameters
+        ----------
+        model : str
+            The model version to be used.
+        system_instruction : str, optional
+            System instructions for model behavior.
+        """
+        from openai import OpenAI
+        self.name = model
+        self.client = OpenAI(
+            base_url=os.environ.get("OPENAI_BASE_URL"),
+            api_key=os.environ.get("OPENAI_API_KEY"),
+        )
+        self.model = model
+        self.history = []
+
+
+    def call_chat(self, history: int, images: list[np.array], text_prompt: str):
+        """
+        Perform context-aware inference with the OpenAI model.
+
+        Parameters
+        ----------
+        history : int
+            The number of environment steps to keep in context.
+        images : list[np.array]
+            A list of RGB image arrays.
+        text_prompt : str
+            The text prompt to process.
+        """
+        text_contents = [{
+            "type": "text",
+            "text": text_prompt
+        }]
+        image_contents = self._image_contents_from_images(images)
+        messages = [{"role": "user", "content": text_contents + image_contents}]
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.history + messages,
+            )
+            self.history.append(messages[0]) # append user message
+            self.history.append({"role": "assistant", "content": [{"type": "text", "text": response.choices[0].message.content}]}) # append response
+
+            # Manage history length based on the number of past steps to keep
+            if len(self.history) > 2 * history:
+                self.history = self.history[-2 * history:]
+
+        except Exception as e:
+            logging.error(f"OPENAI API ERROR: {e}")
+            return "OPENAI API ERROR"
+
+        return response.choices[0].message.content
+
+
+    def rewind(self):
+        """
+        Rewind the chat history by one step.
+        """
+        if len(self.history) > 1:
+            self.history = self.history[:-2]
+
+    def reset(self):
+        """
+        Reset the chat history.
+        """
+        self.history = []
+
+
+    def call(self, images: list[np.array], text_prompt: str):
+        """
+        Perform contextless inference with the Gemini model.
+
+        Parameters
+        ----------
+        images : list[np.array]
+            A list of RGB image arrays.
+        text_prompt : str
+            The text prompt to process.
+        """
+        text_contents = [{
+            "type": "text",
+            "text": text_prompt
+        }]
+        image_contents = self._image_contents_from_images(images)
+        messages = [{"role": "user", "content": text_contents + image_contents}]
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages
+            )
+
+        except Exception as e:
+            logging.error(f"OPENAI API ERROR: {e}")
+            return "OPENAI API ERROR"
+
+        return response.choices[0].message.content
+
+
+    def get_spend(self):
+        """
+        Retrieve the total spend on model usage.
+        NOTE: not implemented
+        """
+        return 0
+
+
+    def _image_contents_from_images(self, images: list[np.ndarray]):
+        image_contents = [
+            {
+                "type": "image_url",
+                "image_url":
+                {
+                    "url": append_mime_tag(encode_image_b64(Image.fromarray(image[:, :, :3], mode='RGB')))
+                }
+            }
+            for image in images
+        ]
+        return image_contents
 
 
 class DepthEstimator:
