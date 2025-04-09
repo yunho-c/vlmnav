@@ -2,14 +2,15 @@
 
 # Configuration Variables
 NUM_GPU=1
-INSTANCES=50
-NUM_EPISODES_PER_INSTANCE=20
+INSTANCES=20
+NUM_EPISODES_PER_INSTANCE=50
 MAX_STEPS_PER_EPISODE=40
 TASK="ObjectNav"
 CFG="ObjectNav"
-NAME=
-SLEEP_INTERVAL=200
-LOG_FREQ=200
+NAME="PACE-Qwen2.5VL7B_512px"
+INITIAL_SLEEP=300
+SLEEP_INTERVAL=10
+LOG_FREQ=10
 PORT=2000
 VENV_NAME="habitat" # Name of the conda environment
 CMD="python scripts/main.py --config ${CFG} -ms ${MAX_STEPS_PER_EPISODE} -ne ${NUM_EPISODES_PER_INSTANCE} --name ${NAME} --instances ${INSTANCES} --parallel -lf ${LOG_FREQ} --port ${PORT}"
@@ -48,6 +49,8 @@ for instance_id in $(seq 0 $((INSTANCES - 1))); do
     "bash -i -c 'source activate ${VENV_NAME} && CUDA_VISIBLE_DEVICES=$GPU_ID $CMD --instance $instance_id'"
   SESSION_NAMES+=("$SESSION_NAME")
 done
+
+sleep $INITIAL_SLEEP # apply delay so that the aggregator does not prematurely stop (before the individual sessions have completely loaded)
 
 # Monitor Tmux Sessions
 while true; do

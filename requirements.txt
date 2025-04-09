@@ -20,3 +20,4 @@ torch==2.2.2
 transformers==4.43.3
 google-generativeai==0.8.3
 wandb==0.18.5
+openai
