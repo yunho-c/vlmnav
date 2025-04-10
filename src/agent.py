@@ -741,7 +741,8 @@ class GOATAgent(VLMNavAgent):
             f"There are {num_actions-1} red arrow(s) superimposed onto your observation, which represent potential actions. " 
             f"These are labeled with a number in a white circle, which represent the location you would move to if you took that action. {'NOTE: choose action 0 if you want to TURN AROUND or DONT SEE ANY GOOD ACTIONS.' if self.step_ndx - self.turned >= self.cfg['turn_around_cooldown'] else ''}"
             f"First, tell me what you see, and if you have any leads on finding the {goal['name']}. Second, tell me which general direction you should go in. "
-            f"Lastly, explain which action is the best and return it as {{'action': <action_key>}}. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS"
+            f"Lastly, explain which action acheives that best. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS. "
+            f"Return your final answer in JSON with the following format: {{'action': <action_key>}}."
             )
             return action_prompt
 
@@ -813,7 +814,8 @@ class ObjectNavAgent(VLMNavAgent):
             f"There are {num_actions - 1} red arrows superimposed onto your observation, which represent potential actions. " 
             f"These are labeled with a number in a white circle, which represent the location you would move to if you took that action. {'NOTE: choose action 0 if you want to TURN AROUND or DONT SEE ANY GOOD ACTIONS. ' if self.step_ndx - self.turned >= self.cfg['turn_around_cooldown'] else ''}"
             f"First, tell me what you see in your sensor observation, and if you have any leads on finding the {goal.upper()}. Second, tell me which general direction you should go in. "
-            f"Lastly, explain which action acheives that best, and return it as {{'action': <action_key>}}. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS"
+            f"Lastly, explain which action acheives that best. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS. "
+            f"Return your final answer in JSON with the following format: {{'action': <action_key>}}."
             )
             return action_prompt
 
