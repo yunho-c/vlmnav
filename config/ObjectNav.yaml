@@ -22,7 +22,7 @@ agent_cfg:
   vlm_cfg:
     model_cls: OpenAIVLM
     model_kwargs:
-      model: hfl/Qwen2.5-VL-7B-Instruct-GPTQ-Int4
+      model: hfl/Qwen2.5-VL-3B-Instruct-GPTQ-Int4
       max_image_res: 512
 
 sim_cfg:
