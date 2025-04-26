@@ -809,11 +809,13 @@ class ObjectNavAgent(VLMNavAgent):
             return pivot_prompt
         if prompt_type == 'action':
             action_prompt = (
-            f"TASK: NAVIGATE TO THE NEAREST {goal.upper()}, and get as close to it as possible. Use your prior knowledge about where items are typically located within a home. "
-            f"There are {num_actions - 1} red arrows superimposed onto your observation, which represent potential actions. " 
-            f"These are labeled with a number in a white circle, which represent the location you would move to if you took that action. {'NOTE: choose action 0 if you want to TURN AROUND or DONT SEE ANY GOOD ACTIONS. ' if self.step_ndx - self.turned >= self.cfg['turn_around_cooldown'] else ''}"
-            f"First, tell me what you see in your sensor observation, and if you have any leads on finding the {goal.upper()}. Second, tell me which general direction you should go in. "
-            f"Lastly, explain which action acheives that best, and return it as {{'action': <action_key>}}. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS"
+                f"TASK: NAVIGATE TO THE NEAREST {goal.upper()}, and get as close to it as possible. Use your prior knowledge about where items are typically located within a home. "
+                f"There are {num_actions - 1} red arrows superimposed onto your observation, which represent potential actions. "
+                f"These are labeled with a number in a white circle, which represent the location you would move to if you took that action. {'NOTE: choose action 0 if you want to TURN AROUND or DONT SEE ANY GOOD ACTIONS. ' if self.step_ndx - self.turned >= self.cfg['turn_around_cooldown'] else ''}"
+                f"First, tell me what you see in your sensor observation, and if you have any leads on finding the {goal.upper()}. Second, tell me which general direction you should go in. "
+                f"Lastly, explain which action acheives that best. Note you CANNOT GO THROUGH CLOSED DOORS, and you DO NOT NEED TO GO UP OR DOWN STAIRS. "
+                f"Please first explain your reasoning, and then return your final answer in JSON with the following format: {{'action': <action_key> (int)}}."
+                # NOTE: By making this change, it is possible that chain-of-thought reasoning is discouraged. It would be ideal to employ a two-stage reasoning-classification pipeline to implement CoT. 
             )
             return action_prompt
 
