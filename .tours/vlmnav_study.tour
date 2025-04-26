@@ -1,0 +1,26 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "VLMNav_Study",
+  "steps": [
+    {
+      "file": "src/agent.py",
+      "description": "Navigability Check",
+      "line": 373
+    },
+    {
+      "file": "src/agent.py",
+      "description": "VLM Output Parsing",
+      "line": 647
+    },
+    {
+      "file": "src/agent.py",
+      "description": "Calling VLM",
+      "line": 357
+    },
+    {
+      "file": "src/agent.py",
+      "description": "Structure of the desired output dict",
+      "line": 361
+    }
+  ]
+}
